@@ -1,34 +1,21 @@
-import { BaiJamjuree_700Bold } from "@expo-google-fonts/bai-jamjuree";
-import { Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto";
-import { useFonts } from "expo-font";
-import { StatusBar } from "expo-status-bar";
-import { ImageBackground, Text, View, TouchableOpacity } from "react-native";
-import { useEffect } from "react";
-import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
-import { styled } from "nativewind";
-import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
+import { Text, View, TouchableOpacity } from "react-native"
+import { useEffect } from "react"
+import { makeRedirectUri, useAuthRequest } from "expo-auth-session"
+import { useRouter } from "expo-router"
+import * as SecureStore from "expo-secure-store"
 
-import blurBg from "../src/assets/bg-blur.png";
-import Stripes from "../src/assets/stripes.svg";
-import NLWLogo from "../src/assets/spacetime-logo.svg";
-import { api } from "../src/lib/api";
-const StyledStripes = styled(Stripes);
+import NLWLogo from "../src/assets/spacetime-logo.svg"
+import { api } from "../src/lib/api"
 
 const discovery = {
   authorizationEndpoint: "https://github.com/login/oauth/authorize",
   tokenEndpoint: "https://github.com/login/oauth/access_token",
   revocationEndpoint:
     "https://github.com/settings/connections/applications/c772b8b968f40ad8f1f6",
-};
+}
 
 export default function App() {
-  const router = useRouter();
-  const [hasFontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_700Bold,
-    BaiJamjuree_700Bold,
-  });
+  const router = useRouter()
 
   const [, response, signInWithGithub] = useAuthRequest(
     {
@@ -39,41 +26,30 @@ export default function App() {
       }),
     },
     discovery
-  );
+  )
 
   async function handleGithubOAuthCode(code: string) {
     const res = await api.post("/auth/register", {
       code,
-    });
+    })
 
-    const { token } = res.data;
+    const { token } = res.data
 
-    await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("token", token)
 
-    router.push("/memories");
+    router.push("/memories")
   }
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { code } = response.params;
+      const { code } = response.params
 
-      handleGithubOAuthCode(code);
+      handleGithubOAuthCode(code)
     }
-  }, [response]);
-
-  if (!hasFontsLoaded) return null;
+  }, [response])
 
   return (
-    <ImageBackground
-      source={blurBg}
-      className="relative flex-1 items-center bg-gray-900 px-8 py-10"
-      imageStyle={{
-        position: "absolute",
-        left: "-100%",
-      }}
-    >
-      <StyledStripes className="absolute left-2" />
-
+    <View className=" flex-1 items-center px-8 py-10">
       <View className="flex-1 items-center justify-center gap-6">
         <NLWLogo />
 
@@ -101,8 +77,6 @@ export default function App() {
       <Text className="text-center font-body text-sm leading-relaxed text-gray-200">
         Feito com 💜 no NLW da Rocketseat
       </Text>
-
-      <StatusBar style="light" translucent />
-    </ImageBackground>
-  );
+    </View>
+  )
 }

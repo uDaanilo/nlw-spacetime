@@ -3,16 +3,27 @@ import fastify from 'fastify'
 import memoriesRoutes from './routes/memories'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
+import multipart from '@fastify/multipart'
+import fastifStatic from '@fastify/static'
 import { authRoutes } from './routes/auth'
+import { uploadRoutes } from './routes/upload'
+import { resolve } from 'path'
 
 const app = fastify()
 
 app.register(cors, {
   origin: '*',
 })
+app.register(multipart)
+app.register(fastifStatic, {
+  root: resolve(__dirname, '../uploads'),
+  prefix: '/uploads',
+})
 app.register(jwt, {
   secret: 'spacetime',
 })
+
+app.register(uploadRoutes)
 app.register(authRoutes, {
   prefix: '/auth',
 })
